@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+    <body>
+        <h1>Distribution of Industries</h1>
+        <p>Distribution of the customers by industries</p>
+        <div id="piechart" style="width: 900px; height: 500px;"></div>
+        <script type="text/javascript">
+            let industries = "{{industries}}"
+            industries = industries.replace(/&quot;/g,'"')
+            industries = JSON.parse(industries)
+            let chartArray = []
+            let titleArray = ["Industry", "Number of Customers"]
+            chartArray.push(titleArray)
+            industries.forEach((industry) => {
+                let tempArray = []
+                tempArray.push(industry.name)
+                tempArray.push(industry.numOfCustomer)
+                chartArray.push(tempArray)
+            })
+
+            google.charts.load('current', {'packages':['corechart']})
+            google.charts.setOnLoadCallback(drawChart)
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable( chartArray )
+
+                var options = {
+                    title: 'Customer Distribution by Industries'
+                }
+                
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'))
+
+                chart.draw(data, options)
+            }
+        </script>
+    </body>
+</html>

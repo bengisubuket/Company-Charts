@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+    <body>
+        <h1>Distribution of Organizations by Countries</h1>
+        <p>Distribution of the Organizations by countries</p>
+        <p>Click on the country you want to see the list of organizations</p>
+        
+        <script type="text/javascript">
+            let countries = "{{countries}}"
+            countries = countries.replace(/&quot;/g,'"')
+            countries = JSON.parse(countries)      
+    
+            let chartArray = []
+            let titleArray = ["Countries", "Number of Organizations"]
+            chartArray.push(titleArray)
+            countries.forEach((country) => {
+                let tempArray = []
+                tempArray.push(country.name)
+                tempArray.push(country.numOfOrganizations)
+                chartArray.push(tempArray)
+            })
+
+            google.charts.load('current', {
+                'packages':['geochart', 'table'],
+                'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+            })
+
+            google.charts.setOnLoadCallback(drawChart)
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable( chartArray )
+
+                var options = {
+                    width:720,
+                    height:540
+                }
+
+                var chart = new google.visualization.GeoChart(document.getElementById('regions_div'))
+
+                chart.draw(data, options)
+
+                var table = new google.visualization.Table(document.getElementById('table_div'))
+
+                google.visualization.events.addListener(chart, 'select', selectHandler);
+
+                function selectHandler() {
+                    var selection = chart.getSelection()
+                    var str = ''
+                    for (var i = 0; i < selection.length; i++) {
+                        var item = selection[i]
+                        if (item.row != null && item.column != null) {
+                        str = data.getFormattedValue(item.row, item.column)
+                        } else if (item.row != null) {
+                        str = data.getFormattedValue(item.row, 0)
+                        } else if (item.column != null) {
+                        str = data.getFormattedValue(0, item.column)
+                        }
+                    } 
+
+
+                    if ( str != "" ) {
+                        let newTableArray = []
+                        countries.forEach((country) => {
+                            
+                            if ( country.name === str ) {
+                                const orgArr = country.orgList.split(", ")
+                                orgArr.forEach( (org) => {
+                                    let tempArray = []
+                                    tempArray.push(org)
+                                    newTableArray.push(tempArray)
+                                })
+                                return newTableArray
+                            }
+                        })
+
+                        var newData = new google.visualization.DataTable()
+
+                        newData.addColumn('string', 'Organizations of ' + str)
+                        newData.addRows(newTableArray)
+
+                        table.draw(newData, {showRowNumber: true, width: 720, height: '100%'})
+
+                    } else {
+                        table.clearChart()
+                        setTimeout( function() {
+                            alert( 'No organizations to display for this country' )
+                        }, 10 )
+                    }
+                }
+            }            
+        </script>
+
+        <table class="columns">
+            <tr><div id="regions_div" ></div></tr>
+            <tr><div id="table_div" ></div></tr>
+        </table>
+    </body>
+</html>

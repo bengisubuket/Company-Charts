@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+  <body>
+    <h1>Support Effort Hours</h1>
+    <p>Customers with More Than {{limit}} Hour Monthly Effort </p>
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+
+    <p>Input your lower limit for effort hours</p>
+
+    <form action="/piechart" method="POST" autocomplete="off">
+      <label for="lowerlimit"></label>
+      <input type="number" name="lowerlimit" min="0" step=10>
+      <input type="submit" value="Submit">
+    </form>
+
+    <script type="text/javascript">
+      let customers = "{{customers}}"
+      customers = customers.replace(/&quot;/g,'"')
+      customers = JSON.parse(customers)
+      let chartArray = []
+      let titleArray = ["Customer Name", "Monthly Hour Effort"]
+      chartArray.push(titleArray)
+      customers.forEach((cust)=> {
+        let tempArray = []
+        tempArray.push(cust.name)
+        tempArray.push(cust.monthlyHour)
+        chartArray.push(tempArray)
+      })
+
+      google.charts.load('current', {'packages':['corechart']})
+      google.charts.setOnLoadCallback(drawChart)
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable( chartArray )
+
+        var options = {
+          title: 'Support Portal Efforts per Customer'
+        }
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'))
+
+        chart.draw(data, options)
+      }
+    </script>
+  </body>
+</html>

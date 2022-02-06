@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+    <body>
+        <h1>Sensor Unit Prices</h1>
+        <p>Customers with {{currency}} as Currency</p>
+        <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+
+        <p>Choose the currency you want to see the sensor unit prices of customers </p>
+
+        <form action="/unitprice" method="post">
+            <label for="currency">Currency</label>
+            <select name="currency">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="AED">AED</option>
+                <option value="GBP">GBP</option>
+                <option value="TL">TL</option>
+                <option value="CHF">CHF</option>
+            </select>
+            <button type="submit" value="Submit">OK</button>
+        </form>
+
+        <script type="text/javascript">
+            let customers = "{{customers}}"
+            customers = customers.replace(/&quot;/g,'"')
+            customers = JSON.parse(customers)
+            let chartArray = []
+            let titleArray = ["Customer Name", "Sensor Unit Price"]
+            chartArray.push(titleArray)
+            customers.forEach((customer) => {
+                let tempArray = []
+                tempArray.push(customer.name)
+                tempArray.push(customer.sensorUnitPrice)
+                chartArray.push(tempArray)
+            })
+
+            google.charts.load('current', {'packages':['bar']})
+            google.charts.setOnLoadCallback(drawChart)
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable( chartArray )
+
+                var options = {
+                    title: 'Sensor Unit Prices per Customer'
+                }
+
+                var chart = new google.charts.Bar(document.getElementById('columnchart_material'))
+
+                chart.draw(data, google.charts.Bar.convertOptions(options))
+            }
+        </script>
+    </body>
+</html>
